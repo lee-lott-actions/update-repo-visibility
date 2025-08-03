@@ -41,7 +41,7 @@ This GitHub Action updates the visibility of a specified repository to `public`,
        steps:
          - name: Update Repository Visibility
            id: update
-           uses: la-actions/update-repo-visibility@v1.0.0
+           uses: lee-lott-actions/update-repo-visibility@v1.0.0
            with:
              repo-name: 'my-repo'
              owner: ${{ github.repository_owner }}
