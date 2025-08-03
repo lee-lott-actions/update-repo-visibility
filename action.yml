@@ -1,6 +1,6 @@
 name: Update Repository Visibility
 description: A GitHub Action to update the visibility of a repository to public, private, or internal using the GitHub API
-author: Louisiana Office of Technology Services
+author: Lee Lott
 
 inputs:
   repo-name:
