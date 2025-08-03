@@ -1,0 +1,36 @@
+name: Update Repository Visibility
+description: A GitHub Action to update the visibility of a repository to public, private, or internal using the GitHub API
+author: Louisiana Office of Technology Services
+
+inputs:
+  repo-name:
+    description: 'The name of the repository to update'
+    required: true
+  owner:
+    description: 'The owner of the repository (user or organization)'
+    required: true
+  token:
+    description: 'GitHub token with repository write access'
+    required: true
+  visibility:
+    description: 'The visibility to set for the repository (public, private, or internal)'
+    required: true
+    default: 'private'
+
+outputs:
+  result:
+    description: 'Result of the visibility update ("success" or "failure")'
+    value: ${{ steps.action.outputs.result }}
+  error-message:
+    description: 'Error message if the visibility update fails'
+    value: ${{ steps.action.outputs.error-message }}
+
+runs:
+  using: composite
+  steps:
+    - name: Update Repository Visibility
+      id: action
+      run: |       
+        source ${{ github.action_path }}/action.sh    
+        update_visibility "${{ inputs.repo-name }}" "${{ inputs.owner }}" "${{ inputs.token }}" "${{ inputs.visibility }}"
+      shell: bash
