@@ -61,19 +61,20 @@ Describe "Update-RepoVisibility" {
 
   It "fails with HTTP 404" {
     Mock Invoke-WebRequest {
-      $response = New-Object System.Net.Http.HttpResponseMessage
-      $response.StatusCode = [System.Net.HttpStatusCode]::NotFound
-      $stream = [System.IO.MemoryStream]::new([System.Text.Encoding]::UTF8.GetBytes('{"message": "Not Found"}'))
-      $response.Content = New-Object System.Net.Http.StreamContent($stream)
-      
-      $exception = New-Object Microsoft.PowerShell.Commands.HttpResponseException("404", $response)
-      throw $exception
+      $errorRecord = [System.Management.Automation.ErrorRecord]::new(
+        [System.Exception]::new("404 Not Found"),
+        "WebCmdletWebResponseException",
+        [System.Management.Automation.ErrorCategory]::InvalidOperation,
+        $null
+      )
+      $errorRecord.ErrorDetails = [System.Management.Automation.ErrorDetails]::new('{"message": "Not Found"}')
+      throw $errorRecord
     }
 
     Update-RepoVisibility -RepoName "non-existing-repo" -Owner "test-owner" -Token "fake-token" -Visibility "public"
 
-    $output = Get-Content $env:GITHUB_OUTPUT
-    $output | Should -Contain "result=failure"
+    $output = Get-Content $env:GITHUB_OUTPUT -Raw
+    $output | Should -Match "result=failure"
     $output | Should -Match "error-message=Failed to update visibility to public"
   }
 

@@ -57,16 +57,17 @@ function Update-RepoVisibility {
   }
   catch {
     $errorMessage = "Unknown error"
-    if ($_.Exception.Response) {
-      $reader = New-Object System.IO.StreamReader($_.Exception.Response.GetResponseStream())
-      $responseBody = $reader.ReadToEnd()
-      $reader.Close()
+    
+    if ($_.ErrorDetails.Message) {
       try {
-        $errorMessage = ($responseBody | ConvertFrom-Json).message
+        $errorMessage = ($_.ErrorDetails.Message | ConvertFrom-Json).message
       }
       catch {
-        $errorMessage = $responseBody
+        $errorMessage = $_.ErrorDetails.Message
       }
+    }
+    elseif ($_.Exception.Message) {
+      $errorMessage = $_.Exception.Message
     }
     
     Add-Content -Path $env:GITHUB_OUTPUT -Value "result=failure"
