@@ -21,7 +21,7 @@ Describe "Update-RepoVisibility" {
     Mock Invoke-WebRequest {
       return @{
         StatusCode = 200
-        Content    = '{"message": "Repository updated"}'
+        Content    = '{"message": "Repository visibility updated"}'
       }
     }
 
@@ -35,7 +35,7 @@ Describe "Update-RepoVisibility" {
     Mock Invoke-WebRequest {
       return @{
         StatusCode = 200
-        Content    = '{"message": "Repository updated"}'
+        Content    = '{"message": "Repository visibility updated"}'
       }
     }
 
@@ -49,7 +49,7 @@ Describe "Update-RepoVisibility" {
     Mock Invoke-WebRequest {
       return @{
         StatusCode = 200
-        Content    = '{"message": "Repository updated"}'
+        Content    = '{"message": "Repository visibility updated"}'
       }
     }
 

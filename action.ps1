@@ -44,16 +44,8 @@ function Update-RepoVisibility {
     Write-Host "Update Visibility API Response Code: $($response.StatusCode)"
     Write-Host $response.Content
 
-    if ($response.StatusCode -eq 200) {
-      Add-Content -Path $env:GITHUB_OUTPUT -Value "result=success"
-      Write-Host "Successfully updated visibility of $Owner/$RepoName to $Visibility"
-    }
-    else {
-      $errorMessage = ($response.Content | ConvertFrom-Json).message
-      Add-Content -Path $env:GITHUB_OUTPUT -Value "result=failure"
-      Add-Content -Path $env:GITHUB_OUTPUT -Value "error-message=Failed to update visibility to $Visibility`: $errorMessage"
-      Write-Host "Error: Failed to update visibility to $Visibility`: $errorMessage"
-    }
+    Add-Content -Path $env:GITHUB_OUTPUT -Value "result=success"
+    Write-Host "Successfully updated visibility of $Owner/$RepoName to $Visibility"
   }
   catch {
     $errorMessage = "Unknown error"

@@ -49,7 +49,7 @@ try {
             }
             else {
                 $statusCode = 200
-                $responseJson = @{ message = "Repository created" } | ConvertTo-Json
+                $responseJson = @{ message = "Repository visibility updated" } | ConvertTo-Json
             }
         }
         else {

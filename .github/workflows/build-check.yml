@@ -21,7 +21,7 @@ jobs:
       - name: Start Mock Server
         shell: pwsh
         run: |
-          $job = Start-Job -ScriptBlock {
+          $global:job = Start-Job -ScriptBlock {
             param($Port)
             & "$using:PWD/tests/Start-MockServer.ps1" -Port $Port
           } -ArgumentList 3000
@@ -48,10 +48,13 @@ jobs:
           
           if (-not $serverReady) {
             Write-Host "ERROR: Mock server failed to start"
-            Stop-Job $job
-            Remove-Job $job
+            Stop-Job $global:job
+            Remove-Job $global:job
             exit 1
           }
+          
+          # Save job ID for cleanup
+          $global:job.Id | Out-File -FilePath "$env:GITHUB_WORKSPACE/mock-server-job-id.txt"
 
       - name: Run Integration Tests
         id: integration-tests
@@ -63,6 +66,21 @@ jobs:
           visibility: 'internal'
         env:
           MOCK_API: http://127.0.0.1:3000
+
+      - name: Stop Mock Server
+        if: always()
+        shell: pwsh
+        run: |
+          if (Test-Path "$env:GITHUB_WORKSPACE/mock-server-job-id.txt") {
+            $jobId = Get-Content "$env:GITHUB_WORKSPACE/mock-server-job-id.txt"
+            $job = Get-Job -Id $jobId -ErrorAction SilentlyContinue
+            if ($job) {
+              Stop-Job $job
+              Remove-Job $job
+              Write-Host "Mock server stopped"
+            }
+            Remove-Item "$env:GITHUB_WORKSPACE/mock-server-job-id.txt" -Force
+          }
 
       - name: Check Integration Test Result
         shell: pwsh
