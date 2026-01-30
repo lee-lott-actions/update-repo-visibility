@@ -60,8 +60,8 @@ function Update-RepoVisibility {
   }
   catch {
     $httpStatus = $_.Exception.Response.StatusCode.value__
-    Write-Host "Error: Failed to update visibility to $Visibility. HTTP Status: $statusCode"
-    Add-Content -Path $env:GITHUB_OUTPUT -Value "Error: Failed to update visibility to $Visibility. HTTP Status: $statusCode"
+    Write-Host "Error: Failed to update visibility to $Visibility. HTTP Status: $httpStatus"
+    Add-Content -Path $env:GITHUB_OUTPUT -Value "error-message=Error: Failed to update visibility to $Visibility. HTTP Status: $httpStatus"
     Add-Content -Path $env:GITHUB_OUTPUT -Value "result=failure"
   }
 }
