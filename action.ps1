@@ -14,56 +14,54 @@ function Update-RepoVisibility {
     return
   }
 
-  # Validate visibility input
-  if ($Visibility -notin @('public', 'private', 'internal')) {
-    Add-Content -Path $env:GITHUB_OUTPUT -Value "result=failure"
-    Add-Content -Path $env:GITHUB_OUTPUT -Value "error-message=Invalid visibility value: $Visibility. Must be public, private, or internal."
-    Write-Host "Error: Invalid visibility value: $Visibility. Must be public, private, or internal."
-    return
+  # Normalize to lowercase for API compatibility
+  $Visibility = $Visibility.ToLower()
+
+  # Validate visibility value
+  if ($Visibility -ne "public" -and $Visibility -ne "private" -and $Visibility -ne "internal") {
+      Write-Output "Error: Invalid visibility value: $Visibility. Must be public, private, or internal."
+      Add-Content -Path $env:GITHUB_OUTPUT -Value "error-message=Invalid visibility value: $Visibility. Must be public, private, or internal."
+      Add-Content -Path $env:GITHUB_OUTPUT -Value "result=failure"
+      return
   }
 
   Write-Host "Updating visibility for repository: $Owner/$RepoName to $Visibility"
 
   # Use MOCK_API if set, otherwise default to GitHub API
-  $apiBaseUrl = if ($env:MOCK_API) { $env:MOCK_API } else { "https://api.github.com" }
-  $apiUrl = "$apiBaseUrl/repos/$Owner/$RepoName"
+  $apiBaseUrl = $env:MOCK_API
+  if (-not $apiBaseUrl) { $apiBaseUrl = "https://api.github.com" }
+  $uri = "$apiBaseUrl/repos/$Owner/$RepoName"
+
+  $headers = @{
+      Authorization          = "Bearer $Token"
+      Accept                 = "application/vnd.github.v3+json"
+      "User-Agent"           = "pwsh-action"
+      "Content-Type"         = "application/json"
+      "X-GitHub-Api-Version" = "2022-11-28"
+  }
+
+  $body = @{ visibility = $Visibility } | ConvertTo-Json
 
   try {
-    $headers = @{
-      "Authorization" = "Bearer $Token"
-      "Accept"        = "application/vnd.github.v3+json"
-      "Content-Type"  = "application/json"
-    }
-
-    $body = @{
-      visibility = $Visibility
-    } | ConvertTo-Json
-
-    $response = Invoke-WebRequest -Uri $apiUrl -Method Patch -Headers $headers -Body $body -ErrorAction Stop
+    $response = Invoke-WebRequest -Uri $apiUrl -Method Patch -Headers $headers -Body $body
 
     Write-Host "Update Visibility API Response Code: $($response.StatusCode)"
-    Write-Host $response.Content
+    if ($response.Content) { Write-Host $response.Content }
+
+    if ($response.StatusCode -ne 200) {
+      Write-Host "Error: Failed to update visibility to $Visibility. HTTP Status: $($response.StatusCode)"
+      Add-Content -Path $env:GITHUB_OUTPUT -Value "error-message=Failed to update visibility to $Visibility. HTTP Status: $($response.StatusCode)"
+      Add-Content -Path $env:GITHUB_OUTPUT -Value "result=failure"
+      return
+    }
 
     Add-Content -Path $env:GITHUB_OUTPUT -Value "result=success"
-    Write-Host "Successfully updated visibility of $Owner/$RepoName to $Visibility"
+    Write-Host "Successfully updated visibility of $Owner/$RepoName to $Visibility"  
   }
   catch {
-    $errorMessage = "Unknown error"
-    
-    if ($_.ErrorDetails.Message) {
-      try {
-        $errorMessage = ($_.ErrorDetails.Message | ConvertFrom-Json).message
-      }
-      catch {
-        $errorMessage = $_.ErrorDetails.Message
-      }
-    }
-    elseif ($_.Exception.Message) {
-      $errorMessage = $_.Exception.Message
-    }
-    
+    $httpStatus = $_.Exception.Response.StatusCode.value__
+    Write-Host "Error: Failed to update visibility to $Visibility. HTTP Status: $statusCode"
+    Add-Content -Path $env:GITHUB_OUTPUT -Value "Error: Failed to update visibility to $Visibility. HTTP Status: $statusCode"
     Add-Content -Path $env:GITHUB_OUTPUT -Value "result=failure"
-    Add-Content -Path $env:GITHUB_OUTPUT -Value "error-message=Failed to update visibility to $Visibility`: $errorMessage"
-    Write-Host "Error: Failed to update visibility to $Visibility`: $errorMessage"
   }
 }
