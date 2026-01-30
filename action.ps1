@@ -43,7 +43,7 @@ function Update-RepoVisibility {
   $body = @{ visibility = $Visibility } | ConvertTo-Json
 
   try {
-    $response = Invoke-WebRequest -Uri $apiUrl -Method Patch -Headers $headers -Body $body
+    $response = Invoke-WebRequest -Uri $uri -Method Patch -Headers $headers -Body $body
 
     Write-Host "Update Visibility API Response Code: $($response.StatusCode)"
     if ($response.Content) { Write-Host $response.Content }
