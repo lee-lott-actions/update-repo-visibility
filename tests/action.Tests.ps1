@@ -75,7 +75,7 @@ Describe "Update-RepoVisibility" {
 
     $output = Get-Content $env:GITHUB_OUTPUT -Raw
     $output | Should -Match "result=failure"
-    $output | Should -Match "error-message=Failed to update visibility to public"
+    $output | Should -Match "error-message=Failed to update visibility to public. HTTP Status: 404"
   }
 
   It "fails with invalid visibility" {
