@@ -62,7 +62,7 @@ Describe "Update-RepoVisibility" {
 
 		$output = Get-Content $env:GITHUB_OUTPUT
 		$output | Should -Contain "result=failure"
-		$output | Where-Object { $_ -match "^error-message=Error: Failed to update visibility to public\. Exception:" } |
+		$output | Where-Object { $_ -match "^error-message=Error: Failed to update visibility of test-owner/non-existing-repo to public\. HTTP Status:" } |
 			Should -Not -BeNullOrEmpty
 	}
 
@@ -115,7 +115,7 @@ Describe "Update-RepoVisibility" {
 
 		$output = Get-Content $env:GITHUB_OUTPUT
 		$output | Should -Contain "result=failure"
-		$output | Where-Object { $_ -match "^error-message=Error: Failed to update visibility of $Owner/$RepoName to $Visibility\. Exception:" } |
+		$output | Where-Object { $_ -match "^error-message=Error: Failed to update visibility of test-owner/existing-repo to public\. Exception:" } |
 			Should -Not -BeNullOrEmpty
 	}  
 }
