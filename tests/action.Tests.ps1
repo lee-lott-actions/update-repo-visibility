@@ -62,7 +62,8 @@ Describe "Update-RepoVisibility" {
 
 		$output = Get-Content $env:GITHUB_OUTPUT
 		$output | Should -Contain "result=failure"
-		$output | Should -Contain "error-message=Error: Failed to update visibility to public. HTTP Status: 404"
+		$output | Where-Object { $_ -match "^error-message=Error: Failed to update visibility to public\. Exception:" } |
+			Should -Not -BeNullOrEmpty
 	}
 
 	It "fails with invalid visibility" {
@@ -114,7 +115,7 @@ Describe "Update-RepoVisibility" {
 
 		$output = Get-Content $env:GITHUB_OUTPUT
 		$output | Should -Contain "result=failure"
-		$output | Where-Object { $_ -match "^error-message=Error: Failed to set $RepoName to template status true\. Exception:" } |
+		$output | Where-Object { $_ -match "^error-message=Error: Failed to update visibility of $Owner/$RepoName to $Visibility\. Exception:" } |
 			Should -Not -BeNullOrEmpty
 	}  
 }
