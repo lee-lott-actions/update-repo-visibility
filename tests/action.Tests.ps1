@@ -2,7 +2,7 @@ BeforeAll {
 	$script:RepoName = "existing-repo"
 	$script:Owner = "test-owner"
 	$script:Token = "fake-token"
-	$script:Visiblity = "public"  
+	$script:Visibility = "public"  
 	. "$PSScriptRoot/../action.ps1"
 }
 
