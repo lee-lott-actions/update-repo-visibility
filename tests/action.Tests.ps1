@@ -1,6 +1,9 @@
 BeforeAll {
-  # Load the PowerShell script
-  . "$PSScriptRoot/../action.ps1"
+	$script:RepoName = "existing-repo"
+	$script:Owner = "test-owner"
+	$script:Token = "fake-token"
+	$script:Visiblity = "public"  
+	. "$PSScriptRoot/../action.ps1"
 }
 
 Describe "Update-RepoVisibility" {
@@ -25,7 +28,7 @@ Describe "Update-RepoVisibility" {
 		  }
 		}
 
-		Update-RepoVisibility -RepoName "existing-repo" -Owner "test-owner" -Token "fake-token" -Visibility "public"
+		Update-RepoVisibility -RepoName $RepoName -Owner $Owner -Token $Token -Visibility "public"
 
 		$output = Get-Content $env:GITHUB_OUTPUT
 		$output | Should -Contain "result=success"
@@ -36,7 +39,7 @@ Describe "Update-RepoVisibility" {
 			[PSCustomObject]@{ StatusCode = 200; Content = '{"message": "Repository visibility updated"}' }
 		}
 
-		Update-RepoVisibility -RepoName "existing-repo" -Owner "test-owner" -Token "fake-token" -Visibility "private"
+		Update-RepoVisibility -RepoName $RepoName -Owner $Owner -Token $Token -Visibility "private"
 
 		$output = Get-Content $env:GITHUB_OUTPUT
 		$output | Should -Contain "result=success"
@@ -47,7 +50,7 @@ Describe "Update-RepoVisibility" {
 			[PSCustomObject]@{ StatusCode = 200; Content = '{"message": "Repository visibility updated"}' }
 		}
 
-		Update-RepoVisibility -RepoName "existing-repo" -Owner "test-owner" -Token "fake-token" -Visibility "internal"
+		Update-RepoVisibility -RepoName $RepoName -Owner $Owner -Token $Token -Visibility "internal"
 
 		$output = Get-Content $env:GITHUB_OUTPUT
 		$output | Should -Contain "result=success"
@@ -58,11 +61,11 @@ Describe "Update-RepoVisibility" {
 			[PSCustomObject]@{ StatusCode = 404; Content = '{"message":"Not Found"}' }
 		}
 
-		Update-RepoVisibility -RepoName "non-existing-repo" -Owner "test-owner" -Token "fake-token" -Visibility "public"
+		Update-RepoVisibility -RepoName $RepoName -Owner $Owner -Token $Token -Visibility $Visibility
 
 		$output = Get-Content $env:GITHUB_OUTPUT
 		$output | Should -Contain "result=failure"
-		$output | Where-Object { $_ -match "^error-message=Error: Failed to update visibility of test-owner/non-existing-repo to public\. HTTP Status:" } |
+		$output | Where-Object { $_ -match "^error-message=Error: Failed to update visibility of $Owner/$RepoName to $Visibility\. HTTP Status:" } |
 			Should -Not -BeNullOrEmpty
 	}
 
@@ -110,12 +113,12 @@ Describe "Update-RepoVisibility" {
 		Mock Invoke-WebRequest { throw "API Error" }
 
 		try {
-			Update-RepoVisibility -RepoName "existing-repo" -Owner "test-owner" -Token "fake-token" -Visibility "public"
+			Update-RepoVisibility -RepoName $RepoName -Owner $Owner -Token $Token -Visibility $Visibility
 		} catch {}
 
 		$output = Get-Content $env:GITHUB_OUTPUT
 		$output | Should -Contain "result=failure"
-		$output | Where-Object { $_ -match "^error-message=Error: Failed to update visibility of test-owner/existing-repo to public\. Exception:" } |
+		$output | Where-Object { $_ -match "^error-message=Error: Failed to update visibility of $Owner/$RepoName to $Visibility\. Exception:" } |
 			Should -Not -BeNullOrEmpty
 	}  
 }
