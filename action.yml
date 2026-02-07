@@ -30,7 +30,7 @@ runs:
   steps:
     - name: Update Repository Visibility
       id: action
-      run: |       
-        source ${{ github.action_path }}/action.sh    
-        update_visibility "${{ inputs.repo-name }}" "${{ inputs.owner }}" "${{ inputs.token }}" "${{ inputs.visibility }}"
-      shell: bash
+      shell: pwsh
+      run: |
+        . "${{ github.action_path }}/action.ps1"
+        Update-RepoVisibility -RepoName "${{ inputs.repo-name }}" -Owner "${{ inputs.owner }}" -Token "${{ inputs.token }}" -Visibility "${{ inputs.visibility }}"
