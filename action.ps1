@@ -45,23 +45,20 @@ function Update-RepoVisibility {
   try {
     $response = Invoke-WebRequest -Uri $uri -Method Patch -Headers $headers -Body $body
 
-    Write-Host "Update Visibility API Response Code: $($response.StatusCode)"
-    if ($response.Content) { Write-Host $response.Content }
-
-    if ($response.StatusCode -ne 200) {
-      Write-Host "Error: Failed to update visibility to $Visibility. HTTP Status: $($response.StatusCode)"
-      Add-Content -Path $env:GITHUB_OUTPUT -Value "error-message=Failed to update visibility to $Visibility. HTTP Status: $($response.StatusCode)"
-      Add-Content -Path $env:GITHUB_OUTPUT -Value "result=failure"
-      return
+    if ($response.StatusCode -eq 200) {
+		Add-Content -Path $env:GITHUB_OUTPUT -Value "result=success"
+		Write-Host "Successfully updated visibility of $Owner/$RepoName to $Visibility"  
     }
-
-    Add-Content -Path $env:GITHUB_OUTPUT -Value "result=success"
-    Write-Host "Successfully updated visibility of $Owner/$RepoName to $Visibility"  
+	else {
+		Write-Host "Error: Failed to update visibility to $Visibility. HTTP Status: $($response.StatusCode)"
+		Add-Content -Path $env:GITHUB_OUTPUT -Value "result=failure"
+		Add-Content -Path $env:GITHUB_OUTPUT -Value "error-message=Failed to update visibility to $Visibility. HTTP Status: $($response.StatusCode)"      
+	}    
   }
   catch {
-    $httpStatus = $_.Exception.Response.StatusCode.value__
-    Write-Host "Error: Failed to update visibility to $Visibility. HTTP Status: $httpStatus"
-    Add-Content -Path $env:GITHUB_OUTPUT -Value "error-message=Error: Failed to update visibility to $Visibility. HTTP Status: $httpStatus"
-    Add-Content -Path $env:GITHUB_OUTPUT -Value "result=failure"
+	$errorMsg = "Error: Failed to update visibility of $Owner/$RepoName to $Visibility. Exception: $($_.Exception.Message)"
+	Add-Content -Path $env:GITHUB_OUTPUT -Value "result=failure"    
+	Add-Content -Path $env:GITHUB_OUTPUT -Value "error-message=$errorMsg"
+    Write-Host $errorMsg
   }
 }
