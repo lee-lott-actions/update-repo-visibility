@@ -33,4 +33,8 @@ runs:
       shell: pwsh
       run: |
         . "${{ github.action_path }}/action.ps1"
-        Update-RepoVisibility -RepoName "${{ inputs.repo-name }}" -Owner "${{ inputs.owner }}" -Token "${{ inputs.token }}" -Visibility "${{ inputs.visibility }}"
+        Update-RepoVisibility `
+          -RepoName "${{ inputs.repo-name }}" `
+          -Owner "${{ inputs.owner }}" `
+          -Token "${{ inputs.token }}" `
+          -Visibility "${{ inputs.visibility }}"
