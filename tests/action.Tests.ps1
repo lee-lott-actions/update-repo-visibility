@@ -3,7 +3,8 @@ Describe "Update-RepoVisibility" {
 		$script:RepoName = "existing-repo"
 		$script:Owner = "test-owner"
 		$script:Token = "fake-token"
-		$script:Visibility = "public"  
+		$script:Visibility = "public" 
+		$script:MockApiUrl  = "http://127.0.0.1:3000"
 		. "$PSScriptRoot/../action.ps1"
 	}
 
