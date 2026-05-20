@@ -25,8 +25,6 @@ function Update-RepoVisibility {
     	return
   	}
 
-  	Write-Host "Updating visibility for repository: $Owner/$RepoName to $Visibility"
-
   	# Use MOCK_API if set, otherwise default to GitHub API
 	$apiBaseUrl = $env:MOCK_API
   	if (-not $apiBaseUrl) { $apiBaseUrl = "https://api.github.com" }
@@ -42,7 +40,8 @@ function Update-RepoVisibility {
   	$body = @{ visibility = $Visibility } | ConvertTo-Json
 
   	try {
-    	$response = Invoke-WebRequest -Uri $uri -Method Patch -Headers $headers -Body $body
+		Write-Host "Updating visibility for repository: $Owner/$RepoName to $Visibility"
+    	$response = Invoke-WebRequest -Uri $uri -Method Patch -Headers $headers -Body $body -SkipHttpErrorCheck
 
     	if ($response.StatusCode -eq 200) {
 			Add-Content -Path $env:GITHUB_OUTPUT -Value "result=success"
