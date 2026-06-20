@@ -96,21 +96,17 @@ Describe "Update-RepoVisibility" {
 			$output | Should -Contain "error-message=Missing required parameters: repo_name, visibility, owner, and token must be provided."
 		}
 	
-		It "unit: Update-RepoVisibility fails with empty Visibility" {
-			Update-RepoVisibility -RepoName "existing-repo" -Owner "test-owner" -Token "fake-token" -Visibility ""
-	
-			$output = Get-Content $env:GITHUB_OUTPUT
-			$output | Should -Contain "result=failure"
-			$output | Should -Contain "error-message=Missing required parameters: repo_name, visibility, owner, and token must be provided."
-		}	
+		It "unit: Update-RepoVisibility throws exception if Visibility is empty" {
+            { 
+  				Update-RepoVisibility -RepoName "existing-repo" -Owner "test-owner" -Token "fake-token" -Visibility ""
+            } | Should -Throw
+        }
 
-		It "unit: Update-RepoVisibility fails with invalid Visibility" {
-			Update-RepoVisibility -RepoName "existing-repo" -Owner "test-owner" -Token "fake-token" -Visibility "invalid"
-	
-			$output = Get-Content $env:GITHUB_OUTPUT
-			$output | Should -Contain "result=failure"
-			$output | Should -Contain "error-message=Invalid visibility value: invalid. Must be public, private, or internal."
-		}
+        It "unit: Update-RepoVisibility throws exception if Visibility is not valid" {
+            { 
+				Update-RepoVisibility -RepoName "existing-repo" -Owner "test-owner" -Token "fake-token" -Visibility "INVALID_TYPE"                
+            } | Should -Throw
+        }
 	}
 
 	Context "Exception Failure Cases" {
