@@ -3,6 +3,7 @@ function Update-RepoVisibility {
     	[string]$RepoName,
     	[string]$Owner,
     	[string]$Token,
+		[ValidateSet("public", "private", "internal")]
     	[string]$Visibility
 	)
 
@@ -16,14 +17,6 @@ function Update-RepoVisibility {
 
   	# Normalize to lowercase for API compatibility
   	$Visibility = $Visibility.ToLower()
-
-  	# Validate visibility value
-  	if ($Visibility -ne "public" -and $Visibility -ne "private" -and $Visibility -ne "internal") {
-      	Write-Output "Error: Invalid visibility value: $Visibility. Must be public, private, or internal."
-      	Add-Content -Path $env:GITHUB_OUTPUT -Value "error-message=Invalid visibility value: $Visibility. Must be public, private, or internal."
-      	Add-Content -Path $env:GITHUB_OUTPUT -Value "result=failure"
-    	return
-  	}
 
   	# Use MOCK_API if set, otherwise default to GitHub API
 	$apiBaseUrl = $env:MOCK_API
