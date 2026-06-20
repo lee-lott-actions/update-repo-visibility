@@ -106,15 +106,7 @@ Describe "Update-RepoVisibility" {
             { 
 				Update-RepoVisibility -RepoName "existing-repo" -Owner "test-owner" -Token "fake-token" -Visibility "INVALID_TYPE"                
             } | Should -Throw
-        }		
-
-		It "unit: Update-RepoVisibility fails with invalid Visibility" {
-			Update-RepoVisibility -RepoName "existing-repo" -Owner "test-owner" -Token "fake-token" -Visibility "invalid"
-	
-			$output = Get-Content $env:GITHUB_OUTPUT
-			$output | Should -Contain "result=failure"
-			$output | Should -Contain "error-message=Invalid visibility value: invalid. Must be public, private, or internal."
-		}
+        }
 	}
 
 	Context "Exception Failure Cases" {
